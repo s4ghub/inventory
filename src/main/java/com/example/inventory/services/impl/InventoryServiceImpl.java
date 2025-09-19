@@ -4,10 +4,12 @@ import com.example.inventory.domainmodels.Product;
 import com.example.inventory.dtos.ProductDto;
 import com.example.inventory.dtos.mapping.DtoEntityMapper;
 import com.example.inventory.exceptionhandling.BadInputException;
+import com.example.inventory.exceptionhandling.NotFoundException;
 import com.example.inventory.repositories.ProductRepository;
 import com.example.inventory.services.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -24,7 +26,7 @@ public class InventoryServiceImpl implements InventoryService {
         this.mapper = mapper;
     }
 
-    @Transactional(value = "inventorySqlTransactionManager")
+    @Transactional(value = "inventorySqlTransactionManager", isolation = Isolation.REPEATABLE_READ)
     @Override
     public ProductDto createProduct(ProductDto dto) {
         Product createdNewProduct = repository.save(mapper.dtoToEntity(dto, null));
@@ -36,12 +38,12 @@ public class InventoryServiceImpl implements InventoryService {
         return List.of();
     }
 
-    @Transactional(value = "inventorySqlTransactionManager", readOnly = true)
+    @Transactional(value = "inventorySqlTransactionManager", readOnly = true, isolation = Isolation.REPEATABLE_READ)
     @Override
     public ProductDto searchProductByName(String name) {
         List<Product> products = repository.findByNameIgnoreCase(name);
         if(products == null || products.isEmpty()) {
-            throw new BadInputException("The name provided is not correct");
+            throw new NotFoundException("Product with the name provided is not found");
         }
         return mapper.entityToDto(products.get(0));
     }

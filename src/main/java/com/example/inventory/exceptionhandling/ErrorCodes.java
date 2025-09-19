@@ -14,5 +14,8 @@ public class ErrorCodes {
     public static final String ERRORCODE3MESSAGE = "Some unexpected error happened";
 
     public static final String ERRORCODE4 = "error4";
-    public static final String ERRORCODE4MESSAGE = "Please check your input";
+    public static final String ERRORCODE4MESSAGE = "Form inputs not correct";
+
+    public static final String ERRORCODE5 = "error5";
+    public static final String ERRORCODE5MESSAGE = "Not found";
 }

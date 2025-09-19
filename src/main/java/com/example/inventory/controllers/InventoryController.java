@@ -27,6 +27,7 @@ public class InventoryController {
     /**
      * This endpoint inserts the record for a Product for the first time
      */
+    //TODO: Duplicate name proper error to provide
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto dto) {
         inputValidator.validate(dto);

@@ -53,6 +53,17 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Custom Input exception which is specific to the application
+     */
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put(ErrorCodes.ERRORCODE5, ErrorCodes.ERRORCODE5MESSAGE);
+        ErrorResponse response = new ErrorResponse(ErrorCodes.ERRORCODE5, ex.getMessage(), errors);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    /**
      * For General purpose Exception handler in case all other above handlers do not catch.
      * @param ex exception
      * @return ResponseEntity

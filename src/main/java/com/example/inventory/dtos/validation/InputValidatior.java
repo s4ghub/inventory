@@ -12,7 +12,7 @@ public class InputValidatior {
     public void validate(ProductDto dto) {
         String price = String.valueOf(dto.getPrice());
         int idxDecimalPoint = price.indexOf(".");
-        if(idxDecimalPoint == -1) {
+        if(idxDecimalPoint != -1) {
             if(price.substring(idxDecimalPoint).length() > 3) {
                 throw new BadInputException("Price should not have more than 2 decimal places");
             }
