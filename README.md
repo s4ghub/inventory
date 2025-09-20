@@ -27,7 +27,7 @@ Run the following commands one after another from the terminal. They should be r
 - docker build -t inventory:latest .
 - docker-compose up
 
-In my case C:\git_new_repo_inventory\inventory>
+In my case the above commands were run from C:\git_new_repo_inventory\inventory>
 
 # For Table creation and DB management: 
 
@@ -65,5 +65,47 @@ version bigint NOT NULL
 Necessary url: 
 
 http://localhost:6868/swagger-ui/index.html
-  
-  
+
+## Example requests
+
+### Create product
+
+curl -X 'POST' \
+'http://localhost:6868/products' \
+-H 'accept: */*' \
+-H 'Content-Type: application/json' \
+-d '{
+
+"name": "Headphone",
+"quantity": 100,
+"price": 155.1
+
+}'
+
+### get all products
+
+curl -X 'GET' \
+'http://localhost:6868/products?page=0&size=2&sortField=id&direction=ASC' \
+-H 'accept: */*'
+
+### Search a product
+
+curl -X 'GET' \
+'http://localhost:6868/products/search?name=heADphone' \
+-H 'accept: */*'
+
+### Update the quantity
+
+curl -X 'PUT' \
+'http://localhost:6868/products/4/quantity' \
+-H 'accept: */*' \
+-H 'Content-Type: application/json' \
+-d '{
+"quantity": 50
+}'
+
+### Delete a product
+
+curl -X 'DELETE' \
+'http://localhost:6868/products/4' \
+-H 'accept: */*'

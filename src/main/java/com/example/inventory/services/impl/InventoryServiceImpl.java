@@ -39,6 +39,7 @@ public class InventoryServiceImpl implements InventoryService {
         return mapper.entityToDto(createdNewProduct);
     }
 
+    @Transactional(value = "inventorySqlTransactionManager", readOnly = true, isolation = Isolation.REPEATABLE_READ)
     @Override
     public PagingResult<ProductDto> getAllProducts(PaginationRequest request) {
         final Pageable pageable = PaginationUtils.getPageable(request.getPage(), request.getSize(), request.getDirection(), request.getSortField());
@@ -80,6 +81,7 @@ public class InventoryServiceImpl implements InventoryService {
         repository.deleteById(id);
     }
 
+    @Transactional(value = "inventorySqlTransactionManager", readOnly = true, isolation = Isolation.REPEATABLE_READ)
     @Override
     public Object productSummary() {
         return null;
