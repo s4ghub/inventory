@@ -18,6 +18,7 @@ The application is developed to manage a product inventory system
 - The app takes care of concurrent user requests
 
 
+
 # How to run the application
 
 Precondition: Docker desktop should be up and running.
@@ -106,4 +107,10 @@ curl -X 'PUT' \
 
 curl -X 'DELETE' \
 'http://localhost:6868/products/1' \
+-H 'accept: */*'
+
+### Get the summary
+
+curl -X 'GET' \
+'http://localhost:8085/products/summary' \
 -H 'accept: */*'

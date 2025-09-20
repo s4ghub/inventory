@@ -2,6 +2,7 @@ package com.example.inventory.controllers;
 
 import com.example.inventory.dtos.ProductDto;
 import com.example.inventory.dtos.QuantityDto;
+import com.example.inventory.dtos.SummaryDto;
 import com.example.inventory.dtos.validation.InputValidator;
 import com.example.inventory.pagination.PaginationRequest;
 import com.example.inventory.pagination.PagingResult;
@@ -85,5 +86,10 @@ public class InventoryController {
     public ResponseEntity<?> deleteProduct(@PathVariable long id) {
         inventoryService.deleteAProductById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("summary")
+    public ResponseEntity<SummaryDto> getStatistics() {
+        return new ResponseEntity<>(inventoryService.productSummary(), HttpStatus.OK);
     }
 }

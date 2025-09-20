@@ -1,8 +1,10 @@
 package com.example.inventory.services.impl;
 
 import com.example.inventory.domainmodels.Product;
+import com.example.inventory.dtos.OutOfStock;
 import com.example.inventory.dtos.ProductDto;
 import com.example.inventory.dtos.QuantityDto;
+import com.example.inventory.dtos.SummaryDto;
 import com.example.inventory.dtos.mapping.DtoEntityMapper;
 import com.example.inventory.exceptionhandling.BadInputException;
 import com.example.inventory.exceptionhandling.NotFoundException;
@@ -10,6 +12,9 @@ import com.example.inventory.pagination.PaginationRequest;
 import com.example.inventory.pagination.PaginationUtils;
 import com.example.inventory.pagination.PagingResult;
 import com.example.inventory.repositories.ProductRepository;
+import com.example.inventory.repositories.summary.IdNameOutOfStock;
+import com.example.inventory.repositories.summary.TotalAndAverage;
+import com.example.inventory.repositories.summary.TotalQuantity;
 import com.example.inventory.services.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,7 +102,39 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Transactional(value = "inventorySqlTransactionManager", readOnly = true, isolation = Isolation.REPEATABLE_READ)
     @Override
-    public Object productSummary() {
-        return null;
+    public SummaryDto productSummary() {
+        //Get statistis from the repository
+        List<TotalQuantity> quantity = repository.totalQuantity(); //Total quantity
+        List<TotalAndAverage> tas = null;
+        if(quantity!=null && quantity.size()>0 && quantity.get(0)!=null && quantity.get(0).getTotalQuantity() == 0) {
+            //We cannot do average. divide by zero not possible
+            tas = repository.total(); // no average
+        } else {
+            tas = repository.totalAverage(); //total quantity with average
+        }
+
+        List<IdNameOutOfStock> idNames = repository.outOfStock();
+        SummaryDto dto = new SummaryDto();
+        //Populate dto to return the statistics
+        if(tas != null && tas.size()>0) {
+            TotalAndAverage ta = tas.get(0);
+            dto.setTotalProducts(ta.getTotalProducts());
+            dto.setTotalQuantity(ta.getTotalQuantity());
+            dto.setAveragePrice(ta.getAveragePrice());
+        }
+        OutOfStock[] ofs = null;
+        if(idNames != null && idNames.size()>0) {
+            ofs = new OutOfStock[idNames.size()];
+            int i = 0;
+            for(IdNameOutOfStock idNm:idNames) {
+                ofs[i] = new OutOfStock();
+                ofs[i].setId(idNm.getId());
+                ofs[i].setName(idNm.getName());
+                i++;
+            }
+            dto.setOutOfStock(ofs);
+        }
+
+        return dto;
     }
 }

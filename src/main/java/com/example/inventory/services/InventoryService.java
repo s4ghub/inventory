@@ -2,6 +2,7 @@ package com.example.inventory.services;
 
 import com.example.inventory.dtos.ProductDto;
 import com.example.inventory.dtos.QuantityDto;
+import com.example.inventory.dtos.SummaryDto;
 import com.example.inventory.pagination.PaginationRequest;
 import com.example.inventory.pagination.PagingResult;
 
@@ -19,6 +20,6 @@ public interface InventoryService {
 
     public void deleteAProductById(Long id);
 
-    public Object productSummary();
+    public SummaryDto productSummary();
 
 }
