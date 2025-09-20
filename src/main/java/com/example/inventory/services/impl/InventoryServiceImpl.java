@@ -2,8 +2,8 @@ package com.example.inventory.services.impl;
 
 import com.example.inventory.domainmodels.Product;
 import com.example.inventory.dtos.ProductDto;
+import com.example.inventory.dtos.QuantityDto;
 import com.example.inventory.dtos.mapping.DtoEntityMapper;
-import com.example.inventory.exceptionhandling.BadInputException;
 import com.example.inventory.exceptionhandling.NotFoundException;
 import com.example.inventory.repositories.ProductRepository;
 import com.example.inventory.services.InventoryService;
@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -48,14 +49,20 @@ public class InventoryServiceImpl implements InventoryService {
         return mapper.entityToDto(products.get(0));
     }
 
+    @Transactional(value = "inventorySqlTransactionManager", isolation = Isolation.REPEATABLE_READ)
     @Override
-    public void updateTheQuantityOfAProduct(ProductDto dto) {
-
+    public void updateTheQuantityOfAProduct(QuantityDto dto, long id) {
+        Optional<Product> productOptional = repository.findById(id);
+        if(productOptional.isEmpty()) {
+            throw new NotFoundException("Product with the name provided is not found");
+        }
+        productOptional.get().setQuantity(dto.getQuantity());
     }
 
+    @Transactional(value = "inventorySqlTransactionManager", isolation = Isolation.REPEATABLE_READ)
     @Override
     public void deleteAProductById(Long id) {
-
+        repository.deleteById(id);
     }
 
     @Override

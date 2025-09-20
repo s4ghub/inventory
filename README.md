@@ -48,6 +48,8 @@ Username: user
 Password: user
 ### Choose Database "inventory"
 
+Right click over Inventory and choose query tool
+
 ### Create the table with the below query
 
 CREATE TABLE product (

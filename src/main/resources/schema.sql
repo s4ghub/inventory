@@ -1,9 +1,3 @@
 DROP TABLE IF EXISTS product;
 
-CREATE TABLE product (
-  id INT AUTO_INCREMENT  PRIMARY KEY,
-  name VARCHAR(30) NOT NULL,
-  quantity INT DEFAULT NOT NULL,
-  price NUMBER DEFAULT NOT NULL,
-  version INT DEFAULT NOT NULL
-);
+CREATE TABLE product ( id serial PRIMARY KEY, name VARCHAR(30) unique NOT NULL, quantity bigint NOT NULL, price real NOT NULL, version bigint NOT NULL );
