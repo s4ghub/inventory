@@ -44,10 +44,15 @@ public class InventoryController {
         return new ResponseEntity<>(inventoryService.createProduct(dto), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get all the products", description = "Get all the products page by page")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved")
+
+    })
     @GetMapping
-    public ResponseEntity<PagingResult<ProductDto>> listAllProducts(@RequestParam(required = false) Integer page,
-                                                                    @RequestParam(required = false) Integer size,
-                                                                    @RequestParam(required = false) String sortField,
+    public ResponseEntity<PagingResult<ProductDto>> listAllProducts(@RequestParam(required = false, defaultValue="0") Integer page,
+                                                                    @RequestParam(required = false, defaultValue="5") Integer size,
+                                                                    @RequestParam(required = false, defaultValue = "id") String sortField,
                                                                     @RequestParam(required = false) Sort.Direction direction) {
         final PaginationRequest request = new PaginationRequest(page, size, sortField, direction);
         return new ResponseEntity<>(inventoryService.getAllProducts(request), HttpStatus.OK);
@@ -88,6 +93,10 @@ public class InventoryController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "get the statistics", description = "Get the statistics")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved statistics")
+    })
     @GetMapping("summary")
     public ResponseEntity<SummaryDto> getStatistics() {
         return new ResponseEntity<>(inventoryService.productSummary(), HttpStatus.OK);
