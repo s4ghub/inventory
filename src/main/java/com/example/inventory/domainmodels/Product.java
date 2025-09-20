@@ -19,10 +19,10 @@ public class Product {
     private String name;
 
     @Column(name = "quantity")
-    private Long quantity;
+    private Long quantity; //current stock
 
     @Column(name = "price")
-    private Double price;
+    private String price;
 
     @Version
     private Long version;
