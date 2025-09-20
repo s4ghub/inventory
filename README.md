@@ -56,7 +56,7 @@ CREATE TABLE product (
 id serial PRIMARY KEY,
 name VARCHAR(30) unique NOT NULL,
 quantity bigint NOT NULL,
-price real NOT NULL,
+price VARCHAR(30) NOT NULL,
 version bigint NOT NULL
 );
 
@@ -75,11 +75,9 @@ curl -X 'POST' \
 -H 'accept: */*' \
 -H 'Content-Type: application/json' \
 -d '{
-
-"name": "Headphone",
+"name": "HeadPhone",
 "quantity": 100,
-"price": 155.1
-
+"price": "100.90"
 }'
 
 ### get all products
@@ -97,15 +95,15 @@ curl -X 'GET' \
 ### Update the quantity
 
 curl -X 'PUT' \
-'http://localhost:6868/products/4/quantity' \
+'http://localhost:6868/products/1/quantity' \
 -H 'accept: */*' \
 -H 'Content-Type: application/json' \
 -d '{
-"quantity": 50
+"quantity": -20
 }'
 
 ### Delete a product
 
 curl -X 'DELETE' \
-'http://localhost:6868/products/4' \
+'http://localhost:6868/products/1' \
 -H 'accept: */*'
