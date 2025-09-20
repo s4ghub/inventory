@@ -5,9 +5,14 @@ import com.example.inventory.dtos.ProductDto;
 import com.example.inventory.dtos.QuantityDto;
 import com.example.inventory.dtos.mapping.DtoEntityMapper;
 import com.example.inventory.exceptionhandling.NotFoundException;
+import com.example.inventory.pagination.PaginationRequest;
+import com.example.inventory.pagination.PaginationUtils;
+import com.example.inventory.pagination.PagingResult;
 import com.example.inventory.repositories.ProductRepository;
 import com.example.inventory.services.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +40,18 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<ProductDto> getAllProducts() {
-        return List.of();
+    public PagingResult<ProductDto> getAllProducts(PaginationRequest request) {
+        final Pageable pageable = PaginationUtils.getPageable(request.getPage(), request.getSize(), request.getDirection(), request.getSortField());
+        final Page<Product> entities = repository.findAll(pageable);
+        final List<ProductDto> dtos = entities.stream().map(mapper::entityToDto).toList();
+        return new PagingResult<>(
+                dtos,
+                entities.getTotalPages(),
+                entities.getTotalElements(),
+                entities.getSize(),
+                entities.getNumber(),
+                entities.isEmpty()
+        );
     }
 
     @Transactional(value = "inventorySqlTransactionManager", readOnly = true, isolation = Isolation.REPEATABLE_READ)

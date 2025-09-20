@@ -3,6 +3,8 @@ package com.example.inventory.controllers;
 import com.example.inventory.dtos.ProductDto;
 import com.example.inventory.dtos.QuantityDto;
 import com.example.inventory.dtos.validation.InputValidatior;
+import com.example.inventory.pagination.PaginationRequest;
+import com.example.inventory.pagination.PagingResult;
 import com.example.inventory.services.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,8 +48,12 @@ public class InventoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDto>> listAllProducts(/*@PageableDefault(page = 0, size = 5, sort = "products", direction = Sort.Direction.ASC)*/ Pageable pageable) {
-        return new ResponseEntity<>(inventoryService.getAllProducts(), HttpStatus.OK);
+    public ResponseEntity<PagingResult<ProductDto>> listAllProducts(@RequestParam(required = false) Integer page,
+                                                                    @RequestParam(required = false) Integer size,
+                                                                    @RequestParam(required = false) String sortField,
+                                                                    @RequestParam(required = false) Sort.Direction direction) {
+        final PaginationRequest request = new PaginationRequest(page, size, sortField, direction);
+        return new ResponseEntity<>(inventoryService.getAllProducts(request), HttpStatus.OK);
     }
 
     /**
