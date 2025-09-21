@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -67,7 +68,7 @@ public class InventoryController {
             @ApiResponse(responseCode = "404", description = "Not found - The product was not found")
     })
     @GetMapping("search")
-    public ResponseEntity<ProductDto> searchProductByName( @RequestParam(value = "name") String name) {
+    public ResponseEntity<ProductDto> searchProductByName( @RequestParam(value = "name") @NotBlank String name) {
         return new ResponseEntity<>(inventoryService.searchProductByName(name), HttpStatus.OK);
     }
 

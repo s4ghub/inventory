@@ -6,7 +6,7 @@ import lombok.Data;
 public class SummaryDto {
     Long totalProducts;
     Long totalQuantity;
-    Double averagePrice;
+    String averagePrice;
     OutOfStock[] outOfStock;
 }
 
