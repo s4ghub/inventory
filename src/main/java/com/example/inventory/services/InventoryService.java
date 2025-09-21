@@ -18,7 +18,7 @@ public interface InventoryService {
 
     public void updateTheQuantityOfAProduct(QuantityDto dto, long id);
 
-    public void deleteAProductById(Long id);
+    public void deleteAProductById(long id);
 
     public SummaryDto productSummary();
 

@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = QuantityNonZeroValidator.class)
-public @interface QuantityNonZeroAnnotation {
+public @interface QuantityNonZeroNonNullAnnotation {
     String message() default "Null or zero are not allowed as quantity while updating";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

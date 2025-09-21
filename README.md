@@ -39,14 +39,20 @@ user: admin@admin.com
 
 password: admin
 ### Register connection to db 
-Use the default server group "servers". Right click
+Use the default server group "servers". Right click over it. Choose Register->Server
 
 Choose "Connection" tab
 
 Host name: db
+
 Port: 5432
+
 Username: user
+
 Password: user
+
+Save connection
+
 ### Choose Database "inventory"
 
 Right click over Inventory and choose query tool

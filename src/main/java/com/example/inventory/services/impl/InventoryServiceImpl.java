@@ -13,8 +13,7 @@ import com.example.inventory.pagination.PaginationUtils;
 import com.example.inventory.pagination.PagingResult;
 import com.example.inventory.repositories.ProductRepository;
 import com.example.inventory.repositories.summary.IdNameOutOfStock;
-import com.example.inventory.repositories.summary.TotalAndAverage;
-import com.example.inventory.repositories.summary.TotalQuantity;
+import com.example.inventory.repositories.summary.TotalProductQuantityAndAverage;
 import com.example.inventory.services.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,14 +80,11 @@ public class InventoryServiceImpl implements InventoryService {
         }
         Product product = productOptional.get();
         Long currentStock = product.getQuantity();
-        //Addition will result more than the max value of Long
-        if(dto.getQuantity()>0 && (Long.MAX_VALUE - dto.getQuantity())<currentStock) {
-            throw new BadInputException(" The quantity is too huge to store");
-        }
+
         //Following may happen when dto.getQuantity() is negative
         //Number of products to be subtracted is more than the current stock
         if((dto.getQuantity() + currentStock)<0) {
-            throw new BadInputException(" Stock is less than the quantity to be subtracted");
+            throw new BadInputException(" Stock may not be less than the quantity to be subtracted");
         }
 
         product.setQuantity(dto.getQuantity() + currentStock);
@@ -96,28 +92,74 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Transactional(value = "inventorySqlTransactionManager", isolation = Isolation.REPEATABLE_READ)
     @Override
-    public void deleteAProductById(Long id) {
+    public void deleteAProductById(long id) {
         repository.deleteById(id);
     }
 
+    //TODO: Better query may be possible here. But as this is statistics, a bit slow doesn't hurt
     @Transactional(value = "inventorySqlTransactionManager", readOnly = true, isolation = Isolation.REPEATABLE_READ)
     @Override
     public SummaryDto productSummary() {
         //Get statistis from the repository
-        List<TotalQuantity> quantity = repository.totalQuantity(); //Total quantity
-        List<TotalAndAverage> tas = null;
+        //**********************************
+        SummaryDto dtoToReturn = new SummaryDto();
+        //Get the data about out of stock from the db
+        List<IdNameOutOfStock> outOfStockDataFromDB = repository.outOfStock();
+        //Populate the dto with the out-of-stock data
+        OutOfStock[] ofs = null;
+        if(outOfStockDataFromDB != null && outOfStockDataFromDB.size()>0) {
+            ofs = new OutOfStock[outOfStockDataFromDB.size()];
+            int i = 0;
+            for(IdNameOutOfStock idNm:outOfStockDataFromDB) {
+                ofs[i] = new OutOfStock();
+                ofs[i].setId(idNm.getId());
+                ofs[i].setName(idNm.getName());
+                i++;
+            }
+            dtoToReturn.setOutOfStock(ofs);
+        }
+
+        //Get the data about total products, quantity and average from the db
+        List<TotalProductQuantityAndAverage> aggregateDataFromDB = null;
+        aggregateDataFromDB = repository.totalProductsOnly();
+
+
+        if(aggregateDataFromDB.get(0).getTotalProducts()>0) { //Product table is not empty
+            aggregateDataFromDB = repository.totalProductsAndQuantityOnly();
+            if(aggregateDataFromDB.get(0).getTotalQuantity()>0) { //Total quantity > 0, we avoid divide by zero error while calculating the average
+                aggregateDataFromDB = repository.totalProductsQuantityAverage();
+            }
+        }
+
+        if(aggregateDataFromDB != null && aggregateDataFromDB.size()>0) {
+            TotalProductQuantityAndAverage ta = aggregateDataFromDB.get(0);
+            dtoToReturn.setTotalProducts(ta.getTotalProducts());
+            dtoToReturn.setTotalQuantity(ta.getTotalQuantity());
+            DecimalFormat df = new DecimalFormat("#.##");
+            String avg = null;
+            if(ta.getAveragePrice() != null) {
+                avg = df.format(ta.getAveragePrice());
+            }
+            dtoToReturn.setAveragePrice(avg);
+        }
+
+        return dtoToReturn;
+
+        //=====old code=====//
+        /*List<TotalQuantity> quantity = repository.totalQuantity(); //Total quantity
+        List<TotalProductQuantityAndAverage> tas = null;
         if(quantity!=null && quantity.size()>0 && quantity.get(0)!=null && quantity.get(0).getTotalQuantity() == 0) {
             //We cannot do average. divide by zero not possible
             tas = repository.total(); // no average
         } else {
-            tas = repository.totalAverage(); //total quantity with average
+            tas = repository.totalProductsQuantityAverage(); //total quantity with average
         }
 
         List<IdNameOutOfStock> idNames = repository.outOfStock();
         SummaryDto dto = new SummaryDto();
         //Populate dto to return the statistics
         if(tas != null && tas.size()>0) {
-            TotalAndAverage ta = tas.get(0);
+            TotalProductQuantityAndAverage ta = tas.get(0);
             dto.setTotalProducts(ta.getTotalProducts());
             dto.setTotalQuantity(ta.getTotalQuantity());
             dto.setAveragePrice(ta.getAveragePrice());
@@ -135,6 +177,6 @@ public class InventoryServiceImpl implements InventoryService {
             dto.setOutOfStock(ofs);
         }
 
-        return dto;
+        return dto;*/
     }
 }

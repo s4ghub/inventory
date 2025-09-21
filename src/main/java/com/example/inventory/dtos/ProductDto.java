@@ -20,11 +20,11 @@ public class ProductDto {
 
     @NotNull(message = "product quantity may not be null")
     @PositiveOrZero(message = "product quantity may not be negative")
-    @Max(10000000L)
+    @Max(1000L)
     private Long quantity;
 
     @NotBlank(message = "product price may not be null or empty or spaces")
-    @Size(min = 5, max = 10, message = "Invalid price: Must be of 5 - 10 characters: No leadin or trailing spaces")
+    @Size(min = 1, max = 10, message = "Invalid price: Must be of 1 - 10 characters: No leadin or trailing spaces")
     private String price;
 
     public void setPrice(String value){

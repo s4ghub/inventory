@@ -2,8 +2,7 @@ package com.example.inventory.repositories;
 
 import com.example.inventory.domainmodels.Product;
 import com.example.inventory.repositories.summary.IdNameOutOfStock;
-import com.example.inventory.repositories.summary.TotalAndAverage;
-import com.example.inventory.repositories.summary.TotalQuantity;
+import com.example.inventory.repositories.summary.TotalProductQuantityAndAverage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,17 +18,19 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             + "FROM Product where quantity = 0", nativeQuery = true)
     List<IdNameOutOfStock> outOfStock();
 
-    //Also returns average
-    @Query(value = "SELECT count(*) AS totalProducts, SUM(quantity) AS totalQuantity, SUM(CAST(price as DECIMAL(9,2)) * quantity) / SUM(quantity) AS averagePrice "
+    //Returns total products only
+    @Query(value = "SELECT count(*) AS totalProducts "
             + "FROM Product", nativeQuery = true)
-    List<TotalAndAverage> totalAverage();
+    List<TotalProductQuantityAndAverage> totalProductsOnly();
 
-    //Does not return average
+    //Returns total products and quantity only
     @Query(value = "SELECT count(*) AS totalProducts, SUM(quantity) AS totalQuantity "
             + "FROM Product", nativeQuery = true)
-    List<TotalAndAverage> total();
+    List<TotalProductQuantityAndAverage> totalProductsAndQuantityOnly();
 
-    @Query(value = "SELECT SUM(quantity) AS totalQuantity "
+    //Returns total products, quantity and Average
+    @Query(value = "SELECT count(*) AS totalProducts, SUM(quantity) AS totalQuantity, SUM(CAST(price as DECIMAL(9,2)) * quantity) / SUM(quantity) AS averagePrice "
             + "FROM Product", nativeQuery = true)
-    List<TotalQuantity> totalQuantity();
+    List<TotalProductQuantityAndAverage> totalProductsQuantityAverage();
+
 }
